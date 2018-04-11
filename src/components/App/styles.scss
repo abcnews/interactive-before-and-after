@@ -1,0 +1,27 @@
+.base {
+}
+
+.mediaWrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.media {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.before {
+}
+
+.after {
+}
+
+.captions {
+  display: flex;
+
+  & > * {
+    width: 50%;
+  }
+}
