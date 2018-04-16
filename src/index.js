@@ -1,3 +1,6 @@
+require('es6-promise/auto');
+require('whatwg-fetch');
+
 const { h, render } = require('preact');
 const { loadBeforeAndAfters } = require('./util');
 
@@ -7,8 +10,6 @@ const beforeAndAfters = loadBeforeAndAfters();
 
 function init() {
   beforeAndAfters.forEach(beforeAndAfter => {
-    console.log({ beforeAndAfter });
-
     const App = require('./components/App');
     render(<App beforeAndAfter={beforeAndAfter} />, beforeAndAfter.mountNode, beforeAndAfter.mountNode.lastChild);
   });

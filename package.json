@@ -27,7 +27,9 @@
   },
   "dependencies": {
     "@abcnews/alternating-case-to-object": "^2.0.0",
+    "es6-promise": "^4.2.4",
     "preact": "^8.2.7",
-    "preact-compat": "^3.18.0"
+    "preact-compat": "^3.18.0",
+    "whatwg-fetch": "^2.0.4"
   }
 }

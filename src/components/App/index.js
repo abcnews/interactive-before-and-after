@@ -1,5 +1,6 @@
 const { h, Component } = require('preact');
 const styles = require('./styles.scss');
+const Video = require('../Video');
 
 class App extends Component {
   constructor(props) {
@@ -7,19 +8,24 @@ class App extends Component {
 
     this.onMouseMove = this.onMouseMove.bind(this);
 
+    this.onRef = this.onRef.bind(this);
+    this.onVideoReady = this.onVideoReady.bind(this);
+    this.onVideoPlay = this.onVideoPlay.bind(this);
+    this.sync = this.sync.bind(this);
+
     this.state = {
       clipX: 0
     };
+
+    this.videosLoaded = 0;
+    this.videoRefs = {};
   }
 
   componentDidMount() {
     const { before, beforeCaption, after, afterCaption } = this.props.beforeAndAfter;
 
-    this.before.appendChild(before.node);
-    this.after.appendChild(after.node);
-
-    this.captions.appendChild(beforeCaption);
-    this.captions.appendChild(afterCaption);
+    this.captions.appendChild(before.captionNode);
+    this.captions.appendChild(after.captionNode);
 
     this.base.addEventListener('mousemove', this.onMouseMove);
   }
@@ -27,13 +33,16 @@ class App extends Component {
   componentWillUnmount() {
     const { before, after } = this.props.beforeAndAfter;
 
-    this.before.removeChild(before.node);
-    this.after.removeChild(after.node);
-
-    this.captions.removeChild(beforeCaption);
-    this.captions.removeChild(afterCaption);
+    this.captions.removeChild(before.captionNode);
+    this.captions.removeChild(after.captionNode);
 
     this.base.removeEventListener('mousemove', this.onMouseMove);
+
+    this.videoRefs.before.removeEventListener('canplaythrough', this.onVideoReady);
+    this.videoRefs.before.removeEventListener('play', this.onVideoPlay);
+    this.videoRefs.before = null;
+    this.videoRefs.after.removeEventListener('canplaythrough', this.onVideoReady);
+    this.videoRefs.after = null;
   }
 
   onMouseMove(event) {
@@ -47,6 +56,37 @@ class App extends Component {
     });
   }
 
+  onRef(which, element) {
+    if (!element) return;
+
+    element.addEventListener('canplaythrough', this.onVideoReady);
+    this.videoRefs[which] = element;
+  }
+
+  onVideoReady() {
+    if (++this.videosLoaded !== 2) return;
+
+    this.videoRefs.before.addEventListener('play', this.onVideoPlay);
+    this.videoRefs.before.play();
+
+    this.sync();
+  }
+
+  onVideoPlay() {
+    if (this.videosLoaded < 2) return;
+
+    this.videoRefs.after.play();
+  }
+
+  sync() {
+    if (this.videosLoaded < 2) return;
+    if (this.videoRefs.before === null) return;
+
+    this.videoRefs.after.currentTime = this.videoRefs.before.currentTime;
+
+    requestAnimationFrame(this.sync);
+  }
+
   render({ beforeAndAfter }) {
     const { before, after } = beforeAndAfter;
     const { width, height } = before;
@@ -55,19 +95,43 @@ class App extends Component {
     const clipBefore = `rect(0, ${clipX}px, ${height}px, 0)`;
     const clipAfter = `rect(0, ${width}px, ${height}px, ${clipX}px)`;
 
+    // TODO: plays inline for mobile safari to work?
+
     return (
       <div className={styles.base}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
-          <div
-            className={`${styles.media} ${styles.before}`}
-            ref={el => (this.before = el)}
-            style={{ clip: clipBefore }}
-          />
-          <div
-            className={`${styles.media} ${styles.after}`}
-            ref={el => (this.after = el)}
-            style={{ clip: clipAfter }}
-          />
+          <div className={styles.media} style={{ clip: clipBefore }}>
+            {before.videoId && (
+              <Video
+                videoId={before.videoId}
+                width={width}
+                height={height}
+                onRef={el => this.onRef('before', el)}
+                defaultMuted={window.innerWidth < 660}
+                muted={window.innerWidth < 660}
+                playsInline
+                sources={[{ src: 'http://mpegmedia.abc.net.au/news/video/201804/mooney.mp4', type: 'video/mp4' }]}
+              />
+            )}
+            {!before.videoId && <img src={before.imageUrl} />}
+          </div>
+          <div className={styles.media} style={{ clip: clipAfter }}>
+            {after.videoId && (
+              <Video
+                videoId={after.videoId}
+                muted={true}
+                width={width}
+                height={height}
+                onRef={el => this.onRef('after', el)}
+                defaultMuted={true}
+                playsInline
+                sources={[{ src: 'http://mpegmedia.abc.net.au/news/video/201804/turnbull.mp4', type: 'video/mp4' }]}
+              />
+            )}
+            {!after.videoId && <img src={after.imageUrl} />}
+          </div>
+
+          <div className={styles.divider} style={{ left: clipX + 'px', height: height + 'px' }} />
         </div>
         <div className={styles.captions} ref={el => (this.captions = el)} />
       </div>

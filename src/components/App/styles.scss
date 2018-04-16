@@ -12,10 +12,11 @@
   left: 0;
 }
 
-.before {
-}
-
-.after {
+.divider {
+  position: relative;
+  background: white;
+  width: 3px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 .captions {
