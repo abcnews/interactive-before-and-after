@@ -7,6 +7,7 @@ class App extends Component {
     super(props);
 
     this.onMouseMove = this.onMouseMove.bind(this);
+    this.onTouchMove = this.onTouchMove.bind(this);
 
     this.onRef = this.onRef.bind(this);
     this.onSourceLoad = this.onSourceLoad.bind(this);
@@ -29,8 +30,6 @@ class App extends Component {
 
     this.captions.appendChild(before.captionNode);
     this.captions.appendChild(after.captionNode);
-
-    this.base.addEventListener('mousemove', this.onMouseMove);
   }
 
   componentWillUnmount() {
@@ -38,8 +37,6 @@ class App extends Component {
 
     this.captions.removeChild(before.captionNode);
     this.captions.removeChild(after.captionNode);
-
-    this.base.removeEventListener('mousemove', this.onMouseMove);
 
     this.videoRefs.before.removeEventListener('canplaythrough', this.onVideoReady);
     this.videoRefs.before.removeEventListener('play', this.onVideoPlay);
@@ -57,6 +54,13 @@ class App extends Component {
         clipX: clientX - left
       };
     });
+  }
+
+  onTouchMove(event) {
+    const { left } = this.base.getBoundingClientRect();
+    const { clientX } = event.targetTouches[0];
+
+    this.setState(state => ({ clipX: clientX - left }));
   }
 
   onRef(which, element) {
@@ -91,7 +95,11 @@ class App extends Component {
     if (this.videosLoaded < 2) return;
     if (this.videoRefs.before === null) return;
 
-    this.videoRefs.after.currentTime = this.videoRefs.before.currentTime;
+    const { before, after } = this.videoRefs;
+    if (Math.floor(after.currentTime) !== Math.floor(before.currentTime)) {
+      after.currentTime = before.currentTime;
+      console.log('corrected time');
+    }
 
     requestAnimationFrame(this.sync);
   }
@@ -108,15 +116,8 @@ class App extends Component {
     const clipBefore = `rect(0, ${clipX}px, ${height}px, 0)`;
     const clipAfter = `rect(0, ${width}px, ${height}px, ${clipX}px)`;
 
-    const beforeSrc = [
-      { src: 'http://mpegmedia.abc.net.au/news/video/201804/mooney.mp4', type: 'video/mp4', width: 1280, height: 720 }
-    ];
-    const afterSrc = [
-      { src: 'http://mpegmedia.abc.net.au/news/video/201804/turnbull.mp4', type: 'video/mp4', width: 1280, height: 720 }
-    ];
-
     return (
-      <div className={styles.base}>
+      <div onMouseMove={this.onMouseMove} onTouchMove={this.onTouchMove}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
           <div className={styles.media} style={{ clip: clipBefore }}>
             {before.videoId && (

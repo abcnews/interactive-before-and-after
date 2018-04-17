@@ -40,7 +40,16 @@ function getBeforeAndAfters(className) {
             captionNode = node.querySelector('.inline-caption');
           } else if (node.className.indexOf('embed-content') > -1) {
             videoId = urlToCM(node.querySelector('a').getAttribute('href'));
-            captionNode = node.querySelector('article');
+            captionNode = document.createElement('div');
+            captionNode.innerHTML = node.querySelector('article').innerHTML;
+
+            // Remove the time
+            const timeNode = captionNode.querySelector('time');
+            if (timeNode) {
+              timeNode.parentNode.removeChild(timeNode);
+            }
+            // Remove the icon
+            captionNode.className = captionNode.className.replace('image-none', '');
 
             const article = document.querySelector('article');
             if (article) {
