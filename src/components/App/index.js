@@ -9,12 +9,15 @@ class App extends Component {
     this.onMouseMove = this.onMouseMove.bind(this);
 
     this.onRef = this.onRef.bind(this);
+    this.onSourceLoad = this.onSourceLoad.bind(this);
     this.onVideoReady = this.onVideoReady.bind(this);
     this.onVideoPlay = this.onVideoPlay.bind(this);
     this.sync = this.sync.bind(this);
 
     this.state = {
-      clipX: 0
+      clipX: 0,
+      sourceWidth: null,
+      sourceHeight: null
     };
 
     this.videosLoaded = 0;
@@ -63,6 +66,12 @@ class App extends Component {
     this.videoRefs[which] = element;
   }
 
+  onSourceLoad(sources) {
+    if (!this.state.sourceHeight && sources.length > 0) {
+      this.setState(state => ({ sourceWidth: sources[0].width, sourceHeight: sources[0].height }));
+    }
+  }
+
   onVideoReady() {
     if (++this.videosLoaded !== 2) return;
 
@@ -89,13 +98,22 @@ class App extends Component {
 
   render({ beforeAndAfter }) {
     const { before, after } = beforeAndAfter;
-    const { width, height } = before;
-    const { clipX } = this.state;
+    let { width, height } = before;
+    const { clipX, sourceWidth, sourceHeight } = this.state;
+
+    if (typeof height === 'undefined' && sourceHeight) {
+      height = width / sourceWidth * sourceHeight;
+    }
 
     const clipBefore = `rect(0, ${clipX}px, ${height}px, 0)`;
     const clipAfter = `rect(0, ${width}px, ${height}px, ${clipX}px)`;
 
-    // TODO: plays inline for mobile safari to work?
+    const beforeSrc = [
+      { src: 'http://mpegmedia.abc.net.au/news/video/201804/mooney.mp4', type: 'video/mp4', width: 1280, height: 720 }
+    ];
+    const afterSrc = [
+      { src: 'http://mpegmedia.abc.net.au/news/video/201804/turnbull.mp4', type: 'video/mp4', width: 1280, height: 720 }
+    ];
 
     return (
       <div className={styles.base}>
@@ -107,10 +125,7 @@ class App extends Component {
                 width={width}
                 height={height}
                 onRef={el => this.onRef('before', el)}
-                defaultMuted={window.innerWidth < 660}
-                muted={window.innerWidth < 660}
-                playsInline
-                sources={[{ src: 'http://mpegmedia.abc.net.au/news/video/201804/mooney.mp4', type: 'video/mp4' }]}
+                onLoad={this.onSourceLoad}
               />
             )}
             {!before.videoId && <img src={before.imageUrl} />}
@@ -123,9 +138,6 @@ class App extends Component {
                 width={width}
                 height={height}
                 onRef={el => this.onRef('after', el)}
-                defaultMuted={true}
-                playsInline
-                sources={[{ src: 'http://mpegmedia.abc.net.au/news/video/201804/turnbull.mp4', type: 'video/mp4' }]}
               />
             )}
             {!after.videoId && <img src={after.imageUrl} />}

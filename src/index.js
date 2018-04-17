@@ -1,21 +1,20 @@
 require('es6-promise/auto');
 require('whatwg-fetch');
 
+const domready = require('domready');
 const { h, render } = require('preact');
-const { loadBeforeAndAfters } = require('./util');
+const { getBeforeAndAfters } = require('./util');
 
 const PROJECT_NAME = 'interactive-before-and-after';
 
-const beforeAndAfters = loadBeforeAndAfters();
-
 function init() {
-  beforeAndAfters.forEach(beforeAndAfter => {
+  getBeforeAndAfters().forEach(beforeAndAfter => {
     const App = require('./components/App');
     render(<App beforeAndAfter={beforeAndAfter} />, beforeAndAfter.mountNode, beforeAndAfter.mountNode.lastChild);
   });
 }
 
-init();
+domready(init);
 
 if (module.hot) {
   module.hot.accept('./components/App', () => {
