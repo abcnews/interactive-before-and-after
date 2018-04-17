@@ -2,6 +2,8 @@ const { h, Component } = require('preact');
 const styles = require('./styles.scss');
 const Video = require('../Video');
 
+const arrowsImage = require('./arrows.png');
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -16,7 +18,8 @@ class App extends Component {
     this.sync = this.sync.bind(this);
 
     this.state = {
-      clipX: 0,
+      showArrows: true,
+      clipX: null,
       sourceWidth: null,
       sourceHeight: null
     };
@@ -51,6 +54,7 @@ class App extends Component {
 
     this.setState(state => {
       return {
+        showArrows: false,
         clipX: clientX - left
       };
     });
@@ -60,7 +64,7 @@ class App extends Component {
     const { left } = this.base.getBoundingClientRect();
     const { clientX } = event.targetTouches[0];
 
-    this.setState(state => ({ clipX: clientX - left }));
+    this.setState(state => ({ showArrows: false, clipX: clientX - left }));
   }
 
   onRef(which, element) {
@@ -72,7 +76,10 @@ class App extends Component {
 
   onSourceLoad(sources) {
     if (!this.state.sourceHeight && sources.length > 0) {
-      this.setState(state => ({ sourceWidth: sources[0].width, sourceHeight: sources[0].height }));
+      this.setState(state => ({
+        sourceWidth: sources[0].width,
+        sourceHeight: sources[0].height
+      }));
     }
   }
 
@@ -98,7 +105,6 @@ class App extends Component {
     const { before, after } = this.videoRefs;
     if (Math.floor(after.currentTime) !== Math.floor(before.currentTime)) {
       after.currentTime = before.currentTime;
-      console.log('corrected time');
     }
 
     requestAnimationFrame(this.sync);
@@ -107,7 +113,11 @@ class App extends Component {
   render({ beforeAndAfter }) {
     const { before, after } = beforeAndAfter;
     let { width, height } = before;
-    const { clipX, sourceWidth, sourceHeight } = this.state;
+    let { clipX, sourceWidth, sourceHeight } = this.state;
+
+    if (clipX === null) {
+      clipX = width / 2;
+    }
 
     if (typeof height === 'undefined' && sourceHeight) {
       height = width / sourceWidth * sourceHeight;
@@ -117,7 +127,7 @@ class App extends Component {
     const clipAfter = `rect(0, ${width}px, ${height}px, ${clipX}px)`;
 
     return (
-      <div onMouseMove={this.onMouseMove} onTouchMove={this.onTouchMove}>
+      <div className={styles.base} onMouseMove={this.onMouseMove} onTouchMove={this.onTouchMove}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
           <div className={styles.media} style={{ clip: clipBefore }}>
             {before.videoId && (
@@ -147,6 +157,20 @@ class App extends Component {
           <div className={styles.divider} style={{ left: clipX + 'px', height: height + 'px' }} />
         </div>
         <div className={styles.captions} ref={el => (this.captions = el)} />
+
+        {this.state.showArrows &&
+          height && (
+            <img
+              src={arrowsImage}
+              className={styles.arrows}
+              style={{
+                width: '100px',
+                height: '30px',
+                top: (height - 30) / 2 + 'px',
+                left: (width - 100) / 2 + 'px'
+              }}
+            />
+          )}
       </div>
     );
   }

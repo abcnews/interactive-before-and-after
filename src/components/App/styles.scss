@@ -1,3 +1,7 @@
+.base {
+  position: relative;
+}
+
 .mediaWrapper {
   overflow: hidden;
   position: relative;
@@ -22,5 +26,25 @@
   & > * {
     width: 50%;
     padding-right: 5px;
+  }
+}
+
+.arrows {
+  position: absolute;
+
+  animation-name: shake;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(-10px);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(-10px);
   }
 }
