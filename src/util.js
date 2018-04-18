@@ -81,10 +81,15 @@ function getBeforeAndAfters(className) {
       mountNode.className = className || '';
       element.parentNode.insertBefore(mountNode, element);
 
+      let config = alternatingCaseToObject(element.getAttribute('name').replace('beforeandafter', ''));
+      config.mode = config.mode || 'slide';
+      config.start = config.start || 50;
+      config.size = config.size || 20;
+
       return {
-        config: alternatingCaseToObject(element.getAttribute('name').replace('beforeandafter', '')),
         before: nodes[0],
         after: nodes[1],
+        config,
         mountNode
       };
     });

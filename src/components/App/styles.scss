@@ -14,9 +14,17 @@
 }
 
 .divider {
-  position: relative;
+  position: absolute;
+  z-index: 10;
   background: white;
   width: 3px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.peekBorder {
+  position: absolute;
+  z-index: 10;
+  border: 3px solid white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
@@ -35,6 +43,13 @@
   animation-name: shake;
   animation-duration: 2s;
   animation-iteration-count: infinite;
+
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+.arrows-visible {
+  opacity: 1;
 }
 
 @keyframes shake {

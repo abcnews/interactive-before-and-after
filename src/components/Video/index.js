@@ -101,6 +101,7 @@ class Video extends Component {
 }
 
 Video.defaultProps = {
+  onRef: () => {},
   onLoad: () => {}
 };
 

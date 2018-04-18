@@ -8,8 +8,7 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.onMouseMove = this.onMouseMove.bind(this);
-    this.onTouchMove = this.onTouchMove.bind(this);
+    this.onPointerMove = this.onPointerMove.bind(this);
 
     this.onRef = this.onRef.bind(this);
     this.onSourceLoad = this.onSourceLoad.bind(this);
@@ -19,7 +18,8 @@ class App extends Component {
 
     this.state = {
       showArrows: true,
-      clipX: null,
+      mouseX: null,
+      mouseY: null,
       sourceWidth: null,
       sourceHeight: null
     };
@@ -46,25 +46,31 @@ class App extends Component {
     this.videoRefs.before = null;
     this.videoRefs.after.removeEventListener('canplaythrough', this.onVideoReady);
     this.videoRefs.after = null;
+
+    clearTimeout(this.arrowTimeout);
+    this.arrowTimeout = null;
   }
 
-  onMouseMove(event) {
-    const { left } = this.base.getBoundingClientRect();
-    const { clientX } = event;
+  onPointerMove(event) {
+    const { top, left } = this.base.getBoundingClientRect();
+    const { clientX, clientY } = event.targetTouches ? event.targetTouches[0] : event;
 
     this.setState(state => {
       return {
         showArrows: false,
-        clipX: clientX - left
+        mouseX: clientX - left,
+        mouseY: clientY - top
       };
     });
-  }
 
-  onTouchMove(event) {
-    const { left } = this.base.getBoundingClientRect();
-    const { clientX } = event.targetTouches[0];
-
-    this.setState(state => ({ showArrows: false, clipX: clientX - left }));
+    clearTimeout(this.arrowTimeout);
+    this.arrowTimeout = setTimeout(() => {
+      this.setState(state => {
+        return {
+          showArrows: true
+        };
+      });
+    }, 2000);
   }
 
   onRef(which, element) {
@@ -111,25 +117,37 @@ class App extends Component {
   }
 
   render({ beforeAndAfter }) {
-    const { before, after } = beforeAndAfter;
+    const { before, after, config } = beforeAndAfter;
     let { width, height } = before;
-    let { clipX, sourceWidth, sourceHeight } = this.state;
-
-    if (clipX === null) {
-      clipX = width / 2;
-    }
+    let { mouseX, mouseY, sourceWidth, sourceHeight } = this.state;
 
     if (typeof height === 'undefined' && sourceHeight) {
       height = width / sourceWidth * sourceHeight;
     }
 
-    const clipBefore = `rect(0, ${clipX}px, ${height}px, 0)`;
-    const clipAfter = `rect(0, ${width}px, ${height}px, ${clipX}px)`;
+    if (mouseX === null) mouseX = config.start * width * 0.01;
+    if (mouseY === null) mouseY = config.start * height * 0.01;
+
+    const peekSize = width * 0.01 * config.size * 0.5;
+
+    let clipBefore;
+    let clipAfter;
+    switch (config.mode) {
+      case 'peek':
+        clipBefore = `rect(0, ${width}px, ${height}px, 0)`; // always show all of the behind one
+        clipAfter = `rect(${mouseY - peekSize}px, ${mouseX + peekSize}px, ${mouseY + peekSize}px, ${mouseX -
+          peekSize}px)`;
+        break;
+      case 'slide':
+      default:
+        clipBefore = `rect(0, ${mouseX}px, ${height}px, 0)`;
+        clipAfter = `rect(0, ${width}px, ${height}px, ${mouseX}px)`;
+    }
 
     return (
-      <div className={styles.base} onMouseMove={this.onMouseMove} onTouchMove={this.onTouchMove}>
+      <div className={styles.base} onMouseMove={this.onPointerMove} onTouchMove={this.onPointerMove}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
-          <div className={styles.media} style={{ clip: clipBefore }}>
+          <div className={styles.media} style={{ clip: clipBefore, zIndex: 1 }}>
             {before.videoId && (
               <Video
                 videoId={before.videoId}
@@ -141,7 +159,7 @@ class App extends Component {
             )}
             {!before.videoId && <img src={before.imageUrl} />}
           </div>
-          <div className={styles.media} style={{ clip: clipAfter }}>
+          <div className={styles.media} style={{ clip: clipAfter, zIndex: 2 }}>
             {after.videoId && (
               <Video
                 videoId={after.videoId}
@@ -154,20 +172,34 @@ class App extends Component {
             {!after.videoId && <img src={after.imageUrl} />}
           </div>
 
-          <div className={styles.divider} style={{ left: clipX + 'px', height: height + 'px' }} />
+          {config.mode === 'slide' && (
+            <div className={styles.divider} style={{ left: mouseX + 'px', height: height + 'px' }} />
+          )}
+
+          {config.mode === 'peek' && (
+            <div
+              className={styles.peekBorder}
+              style={{
+                left: mouseX - peekSize,
+                top: mouseY - peekSize,
+                width: peekSize * 2 + 'px',
+                height: peekSize * 2 + 'px'
+              }}
+            />
+          )}
         </div>
         <div className={styles.captions} ref={el => (this.captions = el)} />
 
-        {this.state.showArrows &&
+        {config.mode === 'slide' &&
           height && (
             <img
               src={arrowsImage}
-              className={styles.arrows}
+              className={[styles.arrows, this.state.showArrows ? styles.arrowsVisible : null].join(' ')}
               style={{
                 width: '100px',
                 height: '30px',
                 top: (height - 30) / 2 + 'px',
-                left: (width - 100) / 2 + 'px'
+                left: mouseX - 50 + 'px'
               }}
             />
           )}
