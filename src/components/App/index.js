@@ -10,6 +10,10 @@ class App extends Component {
 
     this.onPointerMove = this.onPointerMove.bind(this);
 
+    // Used for stopping vertical scroll while moving the reveal
+    this.onTouchStart = this.onTouchStart.bind(this);
+    this.onTouchEnd = this.onTouchEnd.bind(this);
+
     this.onRef = this.onRef.bind(this);
     this.onSourceLoad = this.onSourceLoad.bind(this);
     this.onVideoReady = this.onVideoReady.bind(this);
@@ -49,6 +53,22 @@ class App extends Component {
 
     clearTimeout(this.arrowTimeout);
     this.arrowTimeout = null;
+
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('position');
+  }
+
+  onTouchStart() {
+    document.body.style.setProperty('overflow', 'hidden');
+    document.body.style.setProperty('position', 'fixed');
+  }
+
+  onTouchEnd() {
+    // Let momentum die down a bit
+    setTimeout(() => {
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('position');
+    }, 500);
   }
 
   onPointerMove(event) {
@@ -145,7 +165,13 @@ class App extends Component {
     }
 
     return (
-      <div className={styles.base} onMouseMove={this.onPointerMove} onTouchMove={this.onPointerMove}>
+      <div
+        className={styles.base}
+        onMouseMove={this.onPointerMove}
+        onTouchStart={this.onTouchStart}
+        onTouchMove={this.onPointerMove}
+        onTouchEnd={this.onTouchEnd}
+        onTouchCancel={this.onTouchEnd}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
           <div className={styles.media} style={{ clip: clipBefore, zIndex: 1 }}>
             {before.videoId && (
