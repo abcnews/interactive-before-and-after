@@ -3,6 +3,10 @@ const styles = require('./styles.scss');
 const Video = require('../Video');
 
 const arrowsImage = require('./arrows.png');
+const arrowUpImage = require('./arrow-up.png');
+const arrowDownImage = require('./arrow-down.png');
+const arrowLeftImage = require('./arrow-left.png');
+const arrowRightImage = require('./arrow-right.png');
 
 class App extends Component {
   constructor(props) {
@@ -164,6 +168,50 @@ class App extends Component {
         clipAfter = `rect(0, ${width}px, ${height}px, ${mouseX}px)`;
     }
 
+    let hint;
+    if (height) {
+      if (config.mode === 'slide') {
+        hint = (
+          <img
+            src={arrowsImage}
+            className={[styles.arrows, this.state.showArrows ? styles.arrowsVisible : null].join(' ')}
+            style={{
+              width: '100px',
+              height: '30px',
+              top: (height - 30) / 2 + 'px',
+              left: mouseX - 50 + 'px',
+              zIndex: 10
+            }}
+          />
+        );
+      } else if (config.mode === 'peek') {
+        hint = (
+          <div className={[styles.invisible, this.state.showArrows ? styles.arrowsVisible : null].join(' ')}>
+            <img
+              src={arrowUpImage}
+              className={styles.arrowUp}
+              style={{ top: `${mouseY - peekSize * 1.3 - 30}px`, left: `${mouseX - 15}px` }}
+            />
+            <img
+              src={arrowDownImage}
+              className={styles.arrowDown}
+              style={{ top: `${mouseY + peekSize * 1.3}px`, left: `${mouseX - 15}px` }}
+            />
+            <img
+              src={arrowLeftImage}
+              className={styles.arrowLeft}
+              style={{ top: `${mouseY - 15}px`, left: `${mouseX - peekSize * 1.3 - 30}px` }}
+            />
+            <img
+              src={arrowRightImage}
+              className={styles.arrowRight}
+              style={{ top: `${mouseY - 15}px`, left: `${mouseX + peekSize * 1.3}px` }}
+            />
+          </div>
+        );
+      }
+    }
+
     return (
       <div
         className={styles.base}
@@ -216,19 +264,7 @@ class App extends Component {
         </div>
         <div className={styles.captions} ref={el => (this.captions = el)} />
 
-        {config.mode === 'slide' &&
-          height && (
-            <img
-              src={arrowsImage}
-              className={[styles.arrows, this.state.showArrows ? styles.arrowsVisible : null].join(' ')}
-              style={{
-                width: '100px',
-                height: '30px',
-                top: (height - 30) / 2 + 'px',
-                left: mouseX - 50 + 'px'
-              }}
-            />
-          )}
+        {hint}
       </div>
     );
   }
