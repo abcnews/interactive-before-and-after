@@ -17,7 +17,15 @@ function urlToCM(url) {
  */
 function getBeforeAndAfters(className) {
   if (!window.beforeAndAfters) {
-    window.beforeAndAfters = [].slice.call(document.querySelectorAll(`a[name^=beforeandafter]`)).map(element => {
+    const anchors = [].slice.call(document.querySelectorAll(`a[name^=beforeandafter]`));
+
+    if (anchors.length === 0) {
+      window.__AUNTY_HELPER__(
+        "You're using the Before And After plugin but haven't added any #beforeandafter tags yet."
+      );
+    }
+
+    window.beforeAndAfters = anchors.map(element => {
       let node = element.nextElementSibling;
       let nodes = [];
       let hasMoreContent = true;
@@ -75,6 +83,10 @@ function getBeforeAndAfters(className) {
           node = node.nextElementSibling;
           previousNode.parentNode.removeChild(previousNode);
         }
+      }
+
+      if (nodes.length < 2) {
+        window.__AUNTY_HELPER__('You need to have at least two media elements between your #beforeandafter tags.');
       }
 
       const mountNode = document.createElement('div');

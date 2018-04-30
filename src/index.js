@@ -1,5 +1,6 @@
 require('es6-promise/auto');
 require('whatwg-fetch');
+require('@abcnews/aunty-help');
 
 const domready = require('domready');
 const { h, render } = require('preact');

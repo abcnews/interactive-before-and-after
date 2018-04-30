@@ -18,6 +18,8 @@ class App extends Component {
     this.onTouchStart = this.onTouchStart.bind(this);
     this.onTouchEnd = this.onTouchEnd.bind(this);
 
+    this.toggleAfter = this.toggleAfter.bind(this);
+
     this.onRef = this.onRef.bind(this);
     this.onSourceLoad = this.onSourceLoad.bind(this);
     this.onVideoReady = this.onVideoReady.bind(this);
@@ -26,10 +28,12 @@ class App extends Component {
 
     this.state = {
       showArrows: true,
+      showFadeHint: props.beforeAndAfter.config.mode === 'fade',
       mouseX: null,
       mouseY: null,
       sourceWidth: null,
-      sourceHeight: null
+      sourceHeight: null,
+      isAfterVisible: props.beforeAndAfter.config.mode !== 'fade'
     };
 
     this.videosLoaded = 0;
@@ -73,6 +77,17 @@ class App extends Component {
       document.body.style.removeProperty('overflow');
       document.body.style.removeProperty('position');
     }, 500);
+  }
+
+  toggleAfter() {
+    if (!this.props.beforeAndAfter.config.mode === 'fade') return;
+
+    this.setState(state => {
+      return {
+        isAfterVisible: !state.isAfterVisible,
+        showFadeHint: false
+      };
+    });
   }
 
   onPointerMove(event) {
@@ -162,6 +177,10 @@ class App extends Component {
         clipAfter = `rect(${mouseY - peekSize}px, ${mouseX + peekSize}px, ${mouseY + peekSize}px, ${mouseX -
           peekSize}px)`;
         break;
+      case 'fade':
+        clipBefore = `rect(0, ${width}px, ${height}px, 0)`; // always show all
+        clipAfter = `rect(0, ${width}px, ${height}px, 0)`; // always show all
+        break;
       case 'slide':
       default:
         clipBefore = `rect(0, ${mouseX}px, ${height}px, 0)`;
@@ -209,6 +228,17 @@ class App extends Component {
             />
           </div>
         );
+      } else if (config.mode === 'fade') {
+        hint = (
+          <div
+            className={[styles.fadeHint, this.state.showFadeHint ? styles.visible : null].join(' ')}
+            style={{
+              width: width + 'px',
+              top: height / 2 - 8 + 'px'
+            }}>
+            {window.innerWidth < 660 ? 'Tap' : 'Click'} to switch before/after
+          </div>
+        );
       }
     }
 
@@ -233,7 +263,10 @@ class App extends Component {
             )}
             {!before.videoId && <img src={before.imageUrl} />}
           </div>
-          <div className={styles.media} style={{ clip: clipAfter, zIndex: 2 }}>
+          <div
+            className={styles.media}
+            style={{ clip: clipAfter, zIndex: 2, opacity: this.state.isAfterVisible ? 1 : 0 }}
+            onClick={this.toggleAfter}>
             {after.videoId && (
               <Video
                 videoId={after.videoId}
