@@ -37,7 +37,9 @@ function getBeforeAndAfters(className) {
           let height;
           let videoId;
           let imageUrl;
+          let sources;
           let captionNode;
+
           if (node.className.indexOf('photo full') > -1 || node.className.indexOf('video full') > -1) {
             videoId =
               node.className.indexOf('video') > -1 ? urlToCM(node.querySelector('a').getAttribute('href')) : null;
@@ -63,12 +65,28 @@ function getBeforeAndAfters(className) {
             if (article) {
               width = article.offsetWidth - 20;
             }
+          } else if (node.className.indexOf('VideoEmbed') > -1) {
+            let v = node.querySelector('video');
+            let rect = v.getBoundingClientRect();
+            sources = [
+              {
+                src: v.getAttribute('src'),
+                type: 'video/mp4',
+                width: rect.width,
+                height: rect.height
+              }
+            ];
+            videoId = true;
+            width = rect.width;
+            height = rect.height;
+            captionNode = node.querySelector('p[title]');
           }
 
-          if (videoId || imageUrl) {
+          if (videoId || imageUrl || sources) {
             nodes.push({
               videoId,
               imageUrl,
+              sources,
               height,
               width,
               captionNode

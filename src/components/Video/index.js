@@ -86,10 +86,10 @@ class Video extends Component {
         poster={this.state.imageUrl || posterUrl}
         width={width}
         height={height}
-        autoPlay={window.innerWidth < 660}
-        loop={true}
-        muted={muted || window.innerWidth < 660}
-        defaultmuted={window.innerWidth < 660}
+        autoPlay
+        loop
+        muted
+        defaultmuted
         playsinline
         onLoad={this.props.onLoad}>
         {this.state.sources.map(s => {

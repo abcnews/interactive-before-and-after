@@ -9,7 +9,7 @@ const { getBeforeAndAfters } = require('./util');
 const PROJECT_NAME = 'interactive-before-and-after';
 
 function init() {
-  getBeforeAndAfters().forEach(beforeAndAfter => {
+  getBeforeAndAfters('VideoEmbed u-pull').forEach(beforeAndAfter => {
     const App = require('./components/App');
     render(<App beforeAndAfter={beforeAndAfter} />, beforeAndAfter.mountNode, beforeAndAfter.mountNode.lastChild);
   });

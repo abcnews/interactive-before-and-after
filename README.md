@@ -1,5 +1,7 @@
 # Before and After
 
+NOTE: videos will be automatically muted to allow for autoPlay.
+
 ## Usage in Core
 
 ```
@@ -11,9 +13,9 @@
 
 ### Options
 
-* `#beforeandafterSTART80` - start the slider at 80%
-* `#beforeandafterMODEpeek` - do a peek instead of a slide (other values are fade, ...)
+- `#beforeandafterSTART80` - start the slider at 80%
+- `#beforeandafterMODEpeek` - do a peek instead of a slide (other values are fade, ...)
 
 ## Authors
 
-* Nathan Hoad ([hoad.nathan@abc.net.au](mailto:hoad.nathan@abc.net.au))
+- Nathan Hoad ([hoad.nathan@abc.net.au](mailto:hoad.nathan@abc.net.au))

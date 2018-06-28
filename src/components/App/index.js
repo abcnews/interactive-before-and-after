@@ -41,10 +41,10 @@ class App extends Component {
   }
 
   componentDidMount() {
-    const { before, beforeCaption, after, afterCaption } = this.props.beforeAndAfter;
+    const { before, after } = this.props.beforeAndAfter;
 
-    this.captions.appendChild(before.captionNode);
-    this.captions.appendChild(after.captionNode);
+    if (before.captionNode) this.captions.appendChild(before.captionNode);
+    if (after.captionNode) this.captions.appendChild(after.captionNode);
   }
 
   componentWillUnmount() {
@@ -152,7 +152,7 @@ class App extends Component {
       after.currentTime = before.currentTime;
     }
 
-    requestAnimationFrame(this.sync);
+    // requestAnimationFrame(this.sync);
   }
 
   render({ beforeAndAfter }) {
@@ -161,7 +161,7 @@ class App extends Component {
     let { mouseX, mouseY, sourceWidth, sourceHeight } = this.state;
 
     if (typeof height === 'undefined' && sourceHeight) {
-      height = width / sourceWidth * sourceHeight;
+      height = (width / sourceWidth) * sourceHeight;
     }
 
     if (mouseX === null) mouseX = config.start * width * 0.01;
@@ -257,6 +257,7 @@ class App extends Component {
                 videoId={before.videoId}
                 width={width}
                 height={height}
+                sources={before.sources}
                 onRef={el => this.onRef('before', el)}
                 onLoad={this.onSourceLoad}
               />
@@ -270,9 +271,9 @@ class App extends Component {
             {after.videoId && (
               <Video
                 videoId={after.videoId}
-                muted={true}
                 width={width}
                 height={height}
+                sources={after.sources}
                 onRef={el => this.onRef('after', el)}
               />
             )}
