@@ -50,11 +50,6 @@ function getBeforeAndAfters(className) {
 
   const anchors = [].slice.call(document.querySelectorAll(`a[name^=beforeandafter]`));
 
-  if (anchors.length === 0) {
-    window.__AUNTY_HELPER__("You're using the Before And After plugin but haven't added any #beforeandafter tags yet.");
-    Promise.reject(new Error('Before and After could not be loaded'));
-  }
-
   return Promise.all(
     anchors.map(element => {
       let node = element.nextElementSibling;
@@ -135,10 +130,6 @@ function getBeforeAndAfters(className) {
 
 function resolveNodesToContent(nodes, element, className) {
   return Promise.all(nodes.map(getContent)).then(nodes => {
-    if (nodes.length < 2) {
-      window.__AUNTY_HELPER__('You need to have at least two media elements between your #beforeandafter tags.');
-    }
-
     nodes.forEach(node => {
       if (node.isWaitingForContent) {
         node.isWaitingForContent.parentNode.removeChild(node.isWaitingForContent);

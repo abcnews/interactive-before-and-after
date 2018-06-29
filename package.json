@@ -1,29 +1,21 @@
 {
   "name": "interactive-before-and-after",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "A project generated from aunty's preact-app template.",
   "license": "MIT",
   "private": true,
   "contributors": [
     "Nathan Hoad <nathan@nathanhoad.net>"
   ],
-  "aunty": "preact-app",
+  "aunty": "preact",
   "scripts": {
     "start": "aunty serve",
-    "test": "jest"
-  },
-  "jest": {
-    "transform": {
-      ".*": "<rootDir>/node_modules/@abcnews/aunty/src/utils/jest"
-    }
+    "test": "aunty test"
   },
   "devDependencies": {
-    "@abcnews/aunty": "^7.8.0",
+    "@abcnews/aunty": "^9.3.1",
     "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
-    "html-looks-like": "^1.0.3",
-    "jest": "^22.4.3",
-    "preact-render-to-string": "^3.7.0"
+    "babel-preset-env": "^1.6.1"
   },
   "dependencies": {
     "@abcnews/alternating-case-to-object": "^2.0.0",
