@@ -12,20 +12,51 @@ function urlToCM(url) {
   }
 }
 
+function getContent(node) {
+  if (!node.isWaitingForContent) return Promise.resolve(node);
+
+  return new Promise((resolve, reject) => {
+    const _getContent = (node, done) => {
+      let v = node.isWaitingForContent.querySelector('video');
+      if (v) {
+        let rect = v.getBoundingClientRect();
+        node.sources = [
+          {
+            src: v.getAttribute('src'),
+            type: 'video/mp4',
+            width: rect.width,
+            height: rect.height
+          }
+        ];
+        node.videoId = true;
+        node.width = rect.width;
+        node.height = rect.height;
+        node.captionNode = node.isWaitingForContent.querySelector('p[title]');
+        done(node);
+      } else {
+        setTimeout(() => _getContent(node, done), 1000);
+      }
+    };
+
+    _getContent(node, resolve);
+  });
+}
+
 /**
  * Detect any #beforeandafter sections
  */
 function getBeforeAndAfters(className) {
-  if (!window.beforeAndAfters) {
-    const anchors = [].slice.call(document.querySelectorAll(`a[name^=beforeandafter]`));
+  if (window.__BEFORE_AND_AFTERS__) return Promise.resolve(window.__BEFORE_AND_AFTERS__);
 
-    if (anchors.length === 0) {
-      window.__AUNTY_HELPER__(
-        "You're using the Before And After plugin but haven't added any #beforeandafter tags yet."
-      );
-    }
+  const anchors = [].slice.call(document.querySelectorAll(`a[name^=beforeandafter]`));
 
-    window.beforeAndAfters = anchors.map(element => {
+  if (anchors.length === 0) {
+    window.__AUNTY_HELPER__("You're using the Before And After plugin but haven't added any #beforeandafter tags yet.");
+    Promise.reject(new Error('Before and After could not be loaded'));
+  }
+
+  return Promise.all(
+    anchors.map(element => {
       let node = element.nextElementSibling;
       let nodes = [];
       let hasMoreContent = true;
@@ -33,6 +64,7 @@ function getBeforeAndAfters(className) {
         if (node.tagName && (node.getAttribute('name') || '').indexOf('endbeforeandafter') > -1) {
           hasMoreContent = false;
         } else {
+          let isWaitingForContent = false;
           let width;
           let height;
           let videoId;
@@ -66,24 +98,12 @@ function getBeforeAndAfters(className) {
               width = article.offsetWidth - 20;
             }
           } else if (node.className.indexOf('VideoEmbed') > -1) {
-            let v = node.querySelector('video');
-            let rect = v.getBoundingClientRect();
-            sources = [
-              {
-                src: v.getAttribute('src'),
-                type: 'video/mp4',
-                width: rect.width,
-                height: rect.height
-              }
-            ];
-            videoId = true;
-            width = rect.width;
-            height = rect.height;
-            captionNode = node.querySelector('p[title]');
+            isWaitingForContent = node;
           }
 
-          if (videoId || imageUrl || sources) {
+          if (videoId || imageUrl || isWaitingForContent) {
             nodes.push({
+              isWaitingForContent,
               videoId,
               imageUrl,
               sources,
@@ -99,33 +119,48 @@ function getBeforeAndAfters(className) {
 
           const previousNode = node;
           node = node.nextElementSibling;
-          previousNode.parentNode.removeChild(previousNode);
+          if (!isWaitingForContent) {
+            previousNode.parentNode.removeChild(previousNode);
+          }
         }
       }
 
-      if (nodes.length < 2) {
-        window.__AUNTY_HELPER__('You need to have at least two media elements between your #beforeandafter tags.');
+      return resolveNodesToContent(nodes, element, className);
+    })
+  ).then(anchors => {
+    window.__BEFORE_AND_AFTERS__ = anchors;
+    return window.__BEFORE_AND_AFTERS__;
+  });
+}
+
+function resolveNodesToContent(nodes, element, className) {
+  return Promise.all(nodes.map(getContent)).then(nodes => {
+    if (nodes.length < 2) {
+      window.__AUNTY_HELPER__('You need to have at least two media elements between your #beforeandafter tags.');
+    }
+
+    nodes.forEach(node => {
+      if (node.isWaitingForContent) {
+        node.isWaitingForContent.parentNode.removeChild(node.isWaitingForContent);
       }
-
-      const mountNode = document.createElement('div');
-      mountNode.className = className || '';
-      element.parentNode.insertBefore(mountNode, element);
-
-      let config = alternatingCaseToObject(element.getAttribute('name').replace('beforeandafter', ''));
-      config.mode = config.mode || 'slide';
-      config.start = config.start || 50;
-      config.size = config.size || 20;
-
-      return {
-        before: nodes[0],
-        after: nodes[1],
-        config,
-        mountNode
-      };
     });
-  }
 
-  return window.beforeAndAfters;
+    const mountNode = document.createElement('div');
+    mountNode.className = className || '';
+    element.parentNode.insertBefore(mountNode, element);
+
+    let config = alternatingCaseToObject(element.getAttribute('name').replace('beforeandafter', ''));
+    config.mode = config.mode || 'slide';
+    config.start = config.start || 50;
+    config.size = config.size || 20;
+
+    return {
+      before: nodes[0],
+      after: nodes[1],
+      config,
+      mountNode
+    };
+  });
 }
 
 module.exports.getBeforeAndAfters = getBeforeAndAfters;

@@ -9,13 +9,32 @@ const { getBeforeAndAfters } = require('./util');
 const PROJECT_NAME = 'interactive-before-and-after';
 
 function init() {
-  getBeforeAndAfters('VideoEmbed u-pull').forEach(beforeAndAfter => {
-    const App = require('./components/App');
-    render(<App beforeAndAfter={beforeAndAfter} />, beforeAndAfter.mountNode, beforeAndAfter.mountNode.lastChild);
+  getBeforeAndAfters('VideoEmbed u-pull').then(beforeAndAfters => {
+    beforeAndAfters.forEach(beforeAndAfter => {
+      const App = require('./components/App');
+      render(<App beforeAndAfter={beforeAndAfter} />, beforeAndAfter.mountNode, beforeAndAfter.mountNode.lastChild);
+    });
   });
 }
 
-domready(init);
+// Check to see if Odyssey is present on the page
+function isOdysseyPresent() {
+  return (
+    [].slice.call(document.querySelectorAll('div[class="init-interactive"]')).filter(s => {
+      return s.getAttribute('data-scripts').indexOf('/odyssey/') > -1;
+    }).length > 0
+  );
+}
+
+if (isOdysseyPresent()) {
+  if (window.__ODYSSEY__) {
+    init();
+  } else {
+    window.addEventListener('odyssey:api', init);
+  }
+} else {
+  domready(init);
+}
 
 if (module.hot) {
   module.hot.accept('./components/App', () => {
