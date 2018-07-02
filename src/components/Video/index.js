@@ -1,4 +1,5 @@
 const { h, Component } = require('preact');
+const styles = require('./styles.scss');
 
 function formatSources(sources, sortProp = 'bitrate') {
   return sources.sort((a, b) => +b[sortProp] - +a[sortProp]).map(source => ({
@@ -19,7 +20,10 @@ class Video extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return this.state.sources.length !== nextState.sources.length;
+    if (this.state.sources.length !== nextState.sources.length) return true;
+    if (this.props.height !== nextProps.height) return;
+    if (this.props.width !== nextProps.width) return;
+    return false;
   }
 
   componentDidMount() {
@@ -79,9 +83,10 @@ class Video extends Component {
     }
   }
 
-  render({ videoId, posterUrl, width, height, muted }) {
+  render({ videoId, posterUrl, width, height }) {
     return (
       <video
+        className={styles.base}
         ref={this.props.onRef}
         poster={this.state.imageUrl || posterUrl}
         width={width}

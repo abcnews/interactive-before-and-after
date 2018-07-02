@@ -26,6 +26,8 @@ class App extends Component {
     this.onVideoPlay = this.onVideoPlay.bind(this);
     this.sync = this.sync.bind(this);
 
+    this.onResize = this.onResize.bind(this);
+
     this.state = {
       showArrows: true,
       showFadeHint: props.beforeAndAfter.config.mode === 'fade',
@@ -45,6 +47,8 @@ class App extends Component {
 
     if (before.captionNode) this.captions.appendChild(before.captionNode);
     if (after.captionNode) this.captions.appendChild(after.captionNode);
+
+    window.addEventListener('resize', this.onResize);
   }
 
   componentWillUnmount() {
@@ -62,20 +66,26 @@ class App extends Component {
     clearTimeout(this.arrowTimeout);
     this.arrowTimeout = null;
 
-    document.body.style.removeProperty('overflow');
-    document.body.style.removeProperty('position');
+    // document.body.style.removeProperty('overflow');
+    // document.body.style.removeProperty('position');
+
+    window.removeEventListener('resize', this.onResize);
+  }
+
+  onResize() {
+    this.forceUpdate();
   }
 
   onTouchStart() {
-    document.body.style.setProperty('overflow', 'hidden');
-    document.body.style.setProperty('position', 'fixed');
+    // document.body.style.setProperty('overflow', 'hidden');
+    // document.body.style.setProperty('position', 'fixed');
   }
 
   onTouchEnd() {
     // Let momentum die down a bit
     setTimeout(() => {
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('position');
+      // document.body.style.removeProperty('overflow');
+      // document.body.style.removeProperty('position');
     }, 500);
   }
 
@@ -162,6 +172,15 @@ class App extends Component {
 
     if (typeof height === 'undefined' && sourceHeight) {
       height = (width / sourceWidth) * sourceHeight;
+    }
+
+    if (window.innerWidth < 980) {
+      const ratio = height / width;
+      width = window.innerWidth;
+      height = width * ratio;
+    } else {
+      width = 952;
+      height = 535.5;
     }
 
     if (mouseX === null) mouseX = config.start * width * 0.01;
