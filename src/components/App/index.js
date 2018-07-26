@@ -66,27 +66,11 @@ class App extends Component {
     clearTimeout(this.arrowTimeout);
     this.arrowTimeout = null;
 
-    // document.body.style.removeProperty('overflow');
-    // document.body.style.removeProperty('position');
-
     window.removeEventListener('resize', this.onResize);
   }
 
   onResize() {
     this.forceUpdate();
-  }
-
-  onTouchStart() {
-    // document.body.style.setProperty('overflow', 'hidden');
-    // document.body.style.setProperty('position', 'fixed');
-  }
-
-  onTouchEnd() {
-    // Let momentum die down a bit
-    setTimeout(() => {
-      // document.body.style.removeProperty('overflow');
-      // document.body.style.removeProperty('position');
-    }, 500);
   }
 
   toggleAfter() {
@@ -104,7 +88,7 @@ class App extends Component {
     const { top, left } = this.base.getBoundingClientRect();
     const { clientX, clientY } = event.targetTouches ? event.targetTouches[0] : event;
 
-    this.setState(state => {
+    this.setState(() => {
       return {
         showArrows: false,
         mouseX: clientX - left,
@@ -114,7 +98,7 @@ class App extends Component {
 
     clearTimeout(this.arrowTimeout);
     this.arrowTimeout = setTimeout(() => {
-      this.setState(state => {
+      this.setState(() => {
         return {
           showArrows: true
         };
@@ -131,7 +115,7 @@ class App extends Component {
 
   onSourceLoad(sources) {
     if (!this.state.sourceHeight && sources.length > 0) {
-      this.setState(state => ({
+      this.setState(() => ({
         sourceWidth: sources[0].width,
         sourceHeight: sources[0].height
       }));
@@ -161,8 +145,6 @@ class App extends Component {
     if (Math.floor(after.currentTime) !== Math.floor(before.currentTime)) {
       after.currentTime = before.currentTime;
     }
-
-    // requestAnimationFrame(this.sync);
   }
 
   render({ beforeAndAfter }) {

@@ -29,7 +29,7 @@ class Video extends Component {
   componentDidMount() {
     // load the video
     if (this.props.sources) {
-      this.setState(state => ({ sources: this.props.sources }));
+      this.setState(() => ({ sources: this.props.sources }));
       this.props.onLoad(this.props.sources);
     } else {
       const URL = `${(window.location.origin || '').replace('mobile', 'www')}/news/${this.props.videoId}?pfm=ms`;
@@ -39,7 +39,7 @@ class Video extends Component {
         .then(r => r.text())
         .then(html => {
           this.setState(
-            state => {
+            () => {
               const doc = new DOMParser().parseFromString(html, 'text/html');
 
               if (html.indexOf('WCMS.pluginCache') > -1) {
@@ -83,7 +83,7 @@ class Video extends Component {
     }
   }
 
-  render({ videoId, posterUrl, width, height }) {
+  render({ posterUrl, width, height }) {
     return (
       <video
         className={styles.base}
