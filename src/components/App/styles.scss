@@ -127,3 +127,16 @@
 .visible {
   opacity: 1;
 }
+
+.hintText {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translate(-50%, 0);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  color: white;
+  font-family: ABCSans, Arial, Helvetica, sans-serif;
+  font-size: 20px;
+  transition: opacity 0.3s ease;
+}

@@ -15,8 +15,8 @@ class App extends Component {
     this.onPointerMove = this.onPointerMove.bind(this);
 
     // Used for stopping vertical scroll while moving the reveal
-    this.onTouchStart = this.onTouchStart.bind(this);
-    this.onTouchEnd = this.onTouchEnd.bind(this);
+    // this.onTouchStart = this.onTouchStart.bind(this);
+    // this.onTouchEnd = this.onTouchEnd.bind(this);
 
     this.toggleAfter = this.toggleAfter.bind(this);
 
@@ -189,6 +189,7 @@ class App extends Component {
     }
 
     let hint;
+    let hint2;
     if (height) {
       if (config.mode === 'slide') {
         hint = (
@@ -203,6 +204,11 @@ class App extends Component {
               zIndex: 10
             }}
           />
+        );
+        hint2 = (
+          <div className={styles.hintText} style={{ opacity: this.state.showArrows ? 1 : 0 }}>
+            {window.innerWidth < 500 ? 'Tap and drag' : 'Hover and slide'}
+          </div>
         );
       } else if (config.mode === 'peek') {
         hint = (
@@ -300,6 +306,7 @@ class App extends Component {
         <div className={styles.captions} ref={el => (this.captions = el)} />
 
         {hint}
+        {hint2}
       </div>
     );
   }
