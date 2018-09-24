@@ -14,10 +14,6 @@ class App extends Component {
 
     this.onPointerMove = this.onPointerMove.bind(this);
 
-    // Used for stopping vertical scroll while moving the reveal
-    // this.onTouchStart = this.onTouchStart.bind(this);
-    // this.onTouchEnd = this.onTouchEnd.bind(this);
-
     this.toggleAfter = this.toggleAfter.bind(this);
 
     this.onRef = this.onRef.bind(this);
@@ -253,13 +249,7 @@ class App extends Component {
     }
 
     return (
-      <div
-        className={styles.base}
-        onMouseMove={this.onPointerMove}
-        onTouchStart={this.onTouchStart}
-        onTouchMove={this.onPointerMove}
-        onTouchEnd={this.onTouchEnd}
-        onTouchCancel={this.onTouchEnd}>
+      <div className={styles.base} onMouseMove={this.onPointerMove} onTouchMove={this.onPointerMove}>
         <div className={styles.mediaWrapper} style={{ width: width + 'px', height: height + 'px' }}>
           <div className={styles.media} style={{ clip: clipBefore, zIndex: 1 }}>
             {before.videoId && (
