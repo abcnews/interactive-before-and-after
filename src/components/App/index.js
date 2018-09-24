@@ -74,7 +74,7 @@ class App extends Component {
   }
 
   toggleAfter() {
-    if (!this.props.beforeAndAfter.config.mode === 'fade') return;
+    if (this.props.beforeAndAfter.config.mode !== 'fade') return;
 
     this.setState(state => {
       return {
@@ -85,6 +85,9 @@ class App extends Component {
   }
 
   onPointerMove(event) {
+    event.stopPropagation();
+    event.preventDefault();
+
     const { top, left } = this.base.getBoundingClientRect();
     const { clientX, clientY } = event.targetTouches ? event.targetTouches[0] : event;
 
