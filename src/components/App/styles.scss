@@ -130,13 +130,13 @@
 
 .hintText {
   position: absolute;
-  top: 20px;
-  left: 50%;
-  transform: translate(-50%, 0);
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  top: 0px;
   z-index: 1000;
   color: white;
   font-family: ABCSans, Arial, Helvetica, sans-serif;
-  font-size: 20px;
+  font-size: 1rem;
+  letter-spacing: 0.9px;
   transition: opacity 0.3s ease;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.6);
 }

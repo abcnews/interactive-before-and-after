@@ -205,7 +205,14 @@ class App extends Component {
           />
         );
         hint2 = (
-          <div className={styles.hintText} style={{ opacity: this.state.showArrows ? 1 : 0 }}>
+          <div
+            className={styles.hintText}
+            style={{
+              opacity: this.state.showArrows ? 1 : 0,
+              left: mouseX > width / 2 ? '0px' : 'initial',
+              right: mouseX <= width / 2 ? '0px' : 'initial',
+              transform: 'translate(0,0)'
+            }}>
             {window.innerWidth < 500 ? 'Tap and drag' : 'Hover and slide'}
           </div>
         );
