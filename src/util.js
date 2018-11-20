@@ -78,7 +78,12 @@ function getBeforeAndAfters(className) {
             const rect = node.querySelector('a').getBoundingClientRect();
             width = rect.width;
             height = rect.height;
-            captionNode = node.querySelector('.inline-caption');
+
+            if (node.querySelector('.inline-caption')) {
+              captionNode = node.querySelector('.inline-caption');
+            } else if (node.querySelector('.Caption')) {
+              captionNode = node.querySelector('.Caption');
+            }
           } else if (node.className.indexOf('embed-content') > -1) {
             if (node.querySelector('img')) {
               // TODO: on mobile this image is probably smaller than the dimensions
@@ -91,7 +96,12 @@ function getBeforeAndAfters(className) {
               videoId = urlToCM(node.querySelector('a').getAttribute('href'));
             }
 
-            if (node.querySelector('article') && node.querySelector('article').className.indexOf('type-photo') === -1) {
+            if (node.querySelector('.Caption')) {
+              captionNode = node.querySelector('.Caption');
+            } else if (
+              node.querySelector('article') &&
+              node.querySelector('article').className.indexOf('type-photo') === -1
+            ) {
               captionNode = document.createElement('div');
               captionNode.innerHTML = node.querySelector('article').innerHTML;
               // Remove the time
@@ -136,7 +146,12 @@ function getBeforeAndAfters(className) {
             const rect = node.querySelector('a').getBoundingClientRect();
             width = rect.width;
             height = width * heightRatio;
-            captionNode = node.querySelector('.inline-caption');
+
+            if (node.querySelector('.inline-caption')) {
+              captionNode = node.querySelector('.inline-caption');
+            } else if (node.querySelector('.Caption')) {
+              captionNode = node.querySelector('.Caption');
+            }
           } else if (node.className.indexOf('VideoEmbed') > -1) {
             isWaitingForContent = node;
           }
