@@ -18,6 +18,7 @@ function getContent(node) {
   return new Promise((resolve, reject) => {
     const _getContent = (node, done) => {
       let v = node.isWaitingForContent.querySelector('video');
+      let img = node.isWaitingForContent.querySelector('img');
       if (v) {
         let rect = v.getBoundingClientRect();
         node.sources = [
@@ -32,6 +33,9 @@ function getContent(node) {
         node.width = rect.width;
         node.height = rect.height;
         node.captionNode = node.isWaitingForContent.querySelector('p[title]');
+        done(node);
+      } else if (img) {
+        node.imageUrl = img.currentSrc;
         done(node);
       } else {
         setTimeout(() => _getContent(node, done), 1000);
@@ -76,22 +80,63 @@ function getBeforeAndAfters(className) {
             height = rect.height;
             captionNode = node.querySelector('.inline-caption');
           } else if (node.className.indexOf('embed-content') > -1) {
-            videoId = urlToCM(node.querySelector('a').getAttribute('href'));
-            captionNode = document.createElement('div');
-            captionNode.innerHTML = node.querySelector('article').innerHTML;
-
-            // Remove the time
-            const timeNode = captionNode.querySelector('time');
-            if (timeNode) {
-              timeNode.parentNode.removeChild(timeNode);
+            if (node.querySelector('img')) {
+              // TODO: on mobile this image is probably smaller than the dimensions
+              // that it sits inside
+              imageUrl = node.querySelector('img').getAttribute('src');
+              const rect = node.querySelector('a').getBoundingClientRect();
+              width = rect.width;
+              height = rect.height;
+            } else {
+              videoId = urlToCM(node.querySelector('a').getAttribute('href'));
             }
-            // Remove the icon
-            captionNode.className = captionNode.className.replace('image-none', '');
+
+            if (node.querySelector('article') && node.querySelector('article').className.indexOf('type-photo') === -1) {
+              captionNode = document.createElement('div');
+              captionNode.innerHTML = node.querySelector('article').innerHTML;
+              // Remove the time
+              const timeNode = captionNode.querySelector('time');
+              if (timeNode) {
+                timeNode.parentNode.removeChild(timeNode);
+              }
+              // Remove the icon
+              captionNode.className = captionNode.className.replace('image-none', '');
+            }
 
             const article = document.querySelector('article');
-            if (article) {
+            if (!width && article) {
               width = article.offsetWidth - 20;
             }
+          } else if (node.className.indexOf('ImageEmbed') > -1) {
+            let rendition = '16x9';
+            let heightRatio = 9 / 16;
+            if (window.innerWidth < 400) {
+              rendition = '4x3';
+              heightRatio = 3 / 4;
+            }
+
+            [].slice.call(node.querySelectorAll('picture source')).forEach(source => {
+              if (
+                source
+                  .getAttribute('srcset')
+                  .split(' ')[0]
+                  .indexOf(rendition) > -1
+              ) {
+                imageUrl = source.getAttribute('srcset').split(' ')[0];
+              }
+            });
+
+            // fall back to just the first source
+            if (!imageUrl)
+              imageUrl = node
+                .querySelector('picture source')
+                .getAttribute('srcset')
+                .split(' ')[0];
+
+            const rect = node.querySelector('a').getBoundingClientRect();
+            width = rect.width;
+            height = width * heightRatio;
+            captionNode = node.querySelector('.inline-caption');
           } else if (node.className.indexOf('VideoEmbed') > -1) {
             isWaitingForContent = node;
           }

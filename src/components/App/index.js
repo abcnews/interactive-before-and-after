@@ -269,7 +269,7 @@ class App extends Component {
                 onLoad={this.onSourceLoad}
               />
             )}
-            {!before.videoId && <img src={before.imageUrl} />}
+            {!before.videoId && <img src={before.imageUrl} width={width} height={height} />}
           </div>
           <div
             className={styles.media}
@@ -284,7 +284,7 @@ class App extends Component {
                 onRef={el => this.onRef('after', el)}
               />
             )}
-            {!after.videoId && <img src={after.imageUrl} />}
+            {!after.videoId && <img src={after.imageUrl} width={width} height={height} />}
           </div>
 
           {config.mode === 'slide' && (
