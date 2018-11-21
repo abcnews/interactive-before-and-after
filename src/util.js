@@ -88,16 +88,37 @@ function getBeforeAndAfters(className) {
             if (node.querySelector('img')) {
               // TODO: on mobile this image is probably smaller than the dimensions
               // that it sits inside
-              imageUrl = node.querySelector('img').getAttribute('src');
-              const rect = node.querySelector('a').getBoundingClientRect();
+              let img = node.querySelector('img');
+              if (img.getAttribute('data-src-retina')) {
+                imageUrl = img.getAttribute('data-src-retina');
+              } else if (img.getAttribute('data-src')) {
+                imageUrl = img.getAttribute('data-src');
+              } else {
+                imageUrl = img.getAttribute('src');
+              }
+              let rect;
+              if (node.querySelector('.custom-placeholder')) {
+                rect = node.querySelector('.custom-placeholder').getBoundingClientRect();
+              } else {
+                rect = node.querySelector('a').getBoundingClientRect();
+              }
               width = rect.width;
               height = rect.height;
             } else {
               videoId = urlToCM(node.querySelector('a').getAttribute('href'));
             }
 
+            // Check for all the different ways a caption might be attached
             if (node.querySelector('.Caption')) {
               captionNode = node.querySelector('.Caption');
+            } else if (node.querySelector('h3')) {
+              captionNode = document.createElement('div');
+              let p = document.createElement('div');
+              p.innerText = node.querySelector('h3').innerText;
+              captionNode.appendChild(p);
+              if (node.querySelector('.attribution')) {
+                captionNode.appendChild(node.querySelector('.attribution'));
+              }
             } else if (
               node.querySelector('article') &&
               node.querySelector('article').className.indexOf('type-photo') === -1

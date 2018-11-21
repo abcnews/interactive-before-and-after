@@ -159,7 +159,7 @@ class App extends Component {
       const ratio = height / width;
       width = window.innerWidth;
       height = width * ratio;
-    } else {
+    } else if (!width || !height) {
       width = 952;
       height = 535.5;
     }
