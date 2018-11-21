@@ -2,12 +2,14 @@ const { h, Component } = require('preact');
 const styles = require('./styles.scss');
 
 function formatSources(sources, sortProp = 'bitrate') {
-  return sources.sort((a, b) => +b[sortProp] - +a[sortProp]).map(source => ({
-    src: source.src || source.url,
-    type: source.type || source.contentType,
-    width: +source.width || 0,
-    height: +source.height || 0
-  }));
+  return sources
+    .sort((a, b) => +b[sortProp] - +a[sortProp])
+    .map(source => ({
+      src: source.src || source.url,
+      type: source.type || source.contentType,
+      width: +source.width || 0,
+      height: +source.height || 0
+    }));
 }
 
 class Video extends Component {

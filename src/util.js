@@ -19,7 +19,7 @@ function getContent(node) {
     const _getContent = (node, done) => {
       let v = node.isWaitingForContent.querySelector('video');
       let img = node.isWaitingForContent.querySelector('img');
-      if (v) {
+      if (v && v.getAttribute('src')) {
         let rect = v.getBoundingClientRect();
         node.sources = [
           {
