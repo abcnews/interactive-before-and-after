@@ -1,7 +1,7 @@
 {
   "name": "interactive-before-and-after",
   "version": "3.0.9",
-  "description": "A project generated from aunty's preact-app template.",
+  "description": "A project generated from aunty's preact template.",
   "license": "MIT",
   "private": true,
   "contributors": [
@@ -13,16 +13,13 @@
     "test": "aunty test"
   },
   "devDependencies": {
-    "@abcnews/aunty": "^9.10.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1"
+    "@abcnews/aunty": "^10.9.1"
   },
   "dependencies": {
     "@abcnews/alternating-case-to-object": "^2.0.0",
+    "@abcnews/terminus-fetch": "^2.0.0",
     "domready": "^1.0.8",
-    "es6-promise": "^4.2.4",
     "preact": "^8.2.7",
-    "preact-compat": "^3.18.0",
-    "whatwg-fetch": "^2.0.4"
+    "preact-compat": "^3.18.0"
   }
 }

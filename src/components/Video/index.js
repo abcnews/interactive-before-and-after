@@ -1,14 +1,19 @@
+const terminusFetch = require('@abcnews/terminus-fetch');
 const { h, Component } = require('preact');
 const styles = require('./styles.scss');
 
-function formatSources(sources, sortProp = 'bitrate') {
-  return sources
-    .sort((a, b) => +b[sortProp] - +a[sortProp])
-    .map(source => ({
-      src: source.src || source.url,
-      type: source.type || source.contentType,
-      width: +source.width || 0,
-      height: +source.height || 0
+function pickImageURL(images) {
+  return (images.filter(image => image.ratio === '16x9').sort((a, b) => b.size - a.size)[0] || {}).url;
+}
+
+function getSources(doc) {
+  return doc.media.video.renditions.files
+    .sort((a, b) => +b.bitRate - +a.bitRate)
+    .map(rendition => ({
+      src: rendition.src || rendition.url,
+      size: +rendition.size,
+      width: +rendition.width || 0,
+      height: +rendition.height || 0
     }));
 }
 
@@ -34,54 +39,17 @@ class Video extends Component {
       this.setState(() => ({ sources: this.props.sources }));
       this.props.onLoad(this.props.sources);
     } else {
-      const URL = `${(window.location.origin || '').replace('mobile', 'www')}/news/${this.props.videoId}?pfm=ms`;
-      fetch(URL, {
-        credentials: 'same-origin'
-      })
-        .then(r => r.text())
-        .then(html => {
-          this.setState(
-            () => {
-              const doc = new DOMParser().parseFromString(html, 'text/html');
-
-              if (html.indexOf('WCMS.pluginCache') > -1) {
-                // Phase 2
-                // * Poster can be selected from the DOM
-                // * Sources can be parsed from JS that would nest them under the global `WCMS` object
-                return {
-                  imageUrl: doc
-                    .querySelector('.view-inlineMediaPlayer img')
-                    .getAttribute('src')
-                    .replace('-thumbnail', '-large'),
-                  sources: formatSources(
-                    JSON.parse(html.replace(/\r?\n/, '').match(/"sources":(\[.*\]),"addDownload"/)[1])
-                  )
-                };
-              } else if (html.indexOf('inlineVideoData') > -1) {
-                // Phase 1 (Standard)
-                // * Poster can be selected from the DOM
-                // * Sources can be parsed from JS that would nest them under the global `inlineVideoData` object
-                return {
-                  imageUrl: doc.querySelector('.inline-video img').getAttribute('src'),
-                  sources: formatSources(
-                    JSON.parse(
-                      html
-                        .replace(/\r?\n/g, '')
-                        .match(/inlineVideoData\.push\((\[.*\])\)/)[1]
-                        .replace(/'/g, '"')
-                    )
-                  )
-                };
-              }
-            },
-            () => {
-              this.props.onLoad(this.state.sources);
-            }
-          );
-        })
-        .catch(err => {
-          console.log('ERROR:', err);
-        });
+      terminusFetch({ id: this.props.videoId, type: 'video' })
+      .then(doc => this.setState(
+        () => ({
+          imageUrl: doc._embedded && doc._embedded.mediaThumbnail ?
+            pickImageURL(doc._embedded.mediaThumbnail.complete) :
+            '',
+          sources: getSources(doc)
+        }),
+        () => this.props.onLoad(this.state.sources)
+      ))
+      .catch(err => console.log('ERROR:', err));
     }
   }
 
@@ -99,9 +67,7 @@ class Video extends Component {
         defaultmuted
         playsinline
         onLoad={this.props.onLoad}>
-        {this.state.sources.map(s => {
-          return <source src={s.src} type={s.type} />;
-        })}
+        {this.state.sources.map(s => (<source src={s.src} type="video/mp4" />))}
       </video>
     );
   }

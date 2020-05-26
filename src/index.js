@@ -1,8 +1,5 @@
-require('es6-promise/auto');
-require('whatwg-fetch');
-
 const domready = require('domready');
-const { h, render } = require('preact');
+  const { h, render } = require('preact');
 const { getBeforeAndAfters } = require('./util');
 
 const PROJECT_NAME = 'interactive-before-and-after';
@@ -47,6 +44,5 @@ if (module.hot) {
 }
 
 if (process.env.NODE_ENV === 'development') {
-  require('preact/devtools');
   console.debug(`[${PROJECT_NAME}] public path: ${__webpack_public_path__}`);
 }
