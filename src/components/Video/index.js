@@ -1,6 +1,6 @@
 const terminusFetch = require('@abcnews/terminus-fetch');
 const { h, Component } = require('preact');
-const styles = require('./styles.scss');
+const styles = require('./styles.scss').default;
 
 function pickImageURL(images) {
   return (images.filter(image => image.ratio === '16x9').sort((a, b) => b.size - a.size)[0] || {}).url;

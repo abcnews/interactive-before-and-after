@@ -1,5 +1,5 @@
 const { h, Component } = require('preact');
-const styles = require('./styles.scss');
+const styles = require('./styles.scss').default;
 const Video = require('../Video');
 
 const arrowsImage = require('./arrows.png');
