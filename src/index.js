@@ -5,9 +5,7 @@ const { getBeforeAndAfters } = require("./util");
 const PROJECT_NAME = "interactive-before-and-after";
 
 function init() {
-  console.log("inting");
   getBeforeAndAfters("VideoEmbed u-pull").then((beforeAndAfters) => {
-    console.log(beforeAndAfters);
     beforeAndAfters.forEach((beforeAndAfter) => {
       const App = require("./components/App");
       render(
