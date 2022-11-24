@@ -22,4 +22,5 @@ NOTE: videos will be automatically muted to allow for autoPlay.
 
 ## Authors
 
-- Nathan Hoad ([hoad.nathan@abc.net.au](mailto:hoad.nathan@abc.net.au))
+- Nathan Hoad
+- [Joshua Byrd](https://github.com/phocks)
