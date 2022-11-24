@@ -15,6 +15,7 @@
 	"dependencies": {
 		"@abcnews/alternating-case-to-object": "^2.0.0",
 		"@abcnews/aunty": "^13.1.2",
+		"@abcnews/mount-utils": "^2.0.0",
 		"@abcnews/terminus-fetch": "^2.0.0",
 		"domready": "^1.0.8",
 		"preact": "^8.2.7",
