@@ -1,24 +1,26 @@
 {
-	"name": "interactive-before-and-after",
-	"version": "3.0.10",
-	"description": "A project generated from aunty's preact template.",
-	"license": "MIT",
-	"private": true,
-	"contributors": [
-		"Nathan Hoad <nathan@nathanhoad.net>"
-	],
-	"aunty": "preact",
-	"scripts": {
-		"start": "aunty serve",
-		"test": "aunty test"
-	},
-	"dependencies": {
-		"@abcnews/alternating-case-to-object": "^2.0.0",
-		"@abcnews/aunty": "^13.1.2",
-		"@abcnews/mount-utils": "^2.0.0",
-		"@abcnews/terminus-fetch": "^2.0.0",
-		"domready": "^1.0.8",
-		"preact": "^8.2.7",
-		"preact-compat": "^3.18.0"
-	}
+  "name": "interactive-before-and-after",
+  "version": "3.0.10",
+  "description": "A project generated from aunty's preact template.",
+  "license": "MIT",
+  "private": true,
+  "contributors": [
+    "Nathan Hoad <nathan@nathanhoad.net>"
+  ],
+  "aunty": "preact",
+  "scripts": {
+    "start": "aunty serve",
+    "test": "aunty test"
+  },
+  "devDependencies": {
+    "@abcnews/aunty": "^13.1.2"
+  },
+  "dependencies": {
+    "@abcnews/alternating-case-to-object": "^2.0.0",
+    "@abcnews/mount-utils": "^2.0.0",
+    "@abcnews/terminus-fetch": "^5.0.0",
+    "domready": "^1.0.8",
+    "preact": "^8.2.7",
+    "preact-compat": "^3.18.0"
+  }
 }
